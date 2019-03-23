@@ -89,13 +89,14 @@ def conditional_div(k,l,conditional_num, conditional_den):
 
 
 #Transfer entropy final evaluation
-def te(k,l,h,a,b, lbl_a, lbl_b):
+#Transfer entropy final evaluation
+def te(k,l,h,a,b):
     '''
         transentropy a->b
         te(k,l,h,a,b)
         k - dimension of b, number of samples of the past of b
         l - dimension of a, number of samples of the passt of a
-        h -> instant in the future of a
+        h -> instant in the future of b
     '''
     joint_p_ih_ik_jl = joint_probability(k,l,h,a,b)
     
@@ -122,7 +123,7 @@ def transferEntropy_case(df, k, l, h):
             print('trans ', df.columns[i], df.columns[j])
             if(j != i + df.columns.size/2 and j!=i and j != i - df.columns.size/2):
                 transEntropy[i][j] = te(k,l,h,df[df.columns[i]],
-                                         df[df.columns[j]],'serie_a', 'serie_b')
+                                         df[df.columns[j]])
             clear_output()
     end = time.clock()   
     
