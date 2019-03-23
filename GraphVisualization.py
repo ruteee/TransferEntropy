@@ -4,6 +4,7 @@
 from graphviz import Digraph
 
 def graph_simple(df, eng = 'dot'):
+    '''df - dataframe filled with transfer entropies. Eng - graphviz engine for grap plot -  Standard: dot'''
     edge_style = ""
     g = Digraph(engine=eng)
     in_graph = []
