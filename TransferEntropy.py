@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# In[1]:
+
+
 import pandas as pd
 import numpy as np
 
@@ -11,13 +14,22 @@ import itertools
 
 from IPython.display import clear_output
 
-def joint_probability(k,l,h, a, b):
+
+# In[2]:
+
+
+def joint_probability_new_version(k,l,h, a, b, lbl_a, lbl_b):
     '''
-        k B time horizon
-        l A time horizon
-        h instant in the future of serie B
+    k B time horizon
+    l A time horizon
+    h instant in the future of serie B
+
+    a, b array type
+
+    lbl_a - label of a series
+    lbl_b - label of b series
+    '''
         
-        a, b array type'''
     
     numStates=2**(k+l+1)
     combinations = list(map(list, itertools.product([0, 1], repeat=k+l+1)))
@@ -33,10 +45,52 @@ def joint_probability(k,l,h, a, b):
         idx = combinations.index(comb)
         prob_cnjt[idx] = gpd.iloc[i]['Count']/total
 
+
+# In[3]:
+
+
+def joint_probability(k,l,h, a, b):
+    '''
+        k B time horizon
+        l A time horizon
+        h instant in the future of serie B
+        
+        a, b array type'''
+
+    #Alarm Series A (cause), B (effect), same len
+    #tested
+    sizeSeries = a.size
+    transEntropy = 0
+    numStates = 2**(k + l  + 1)
+    combinations = list(map(list, itertools.product([0, 1], repeat=k+l+1)))
+    counting = np.zeros(numStates)
+    prob_cnjt = np.zeros(numStates)
+    a_prob_ind = []
+    b_prob_ind = []
+    #joitn probability p(i_sub_t+1), i_sub_t**k, j_sub_t**l)
+    inicio = np.max([k,l]) - 1
+    for i in np.arange(inicio, sizeSeries - h):
+        for hk in np.arange(0,k):
+                b_prob_ind.append(b[i - hk])
+        for hl in np.arange(0,l):
+                a_prob_ind.append(a[i - hl])
+
+        #print(a.size, b.size, a.size -1)     
+        ab = [b[i + h]] + b_prob_ind + a_prob_ind 
+        index_comb = combinations.index(ab)
+        counting[index_comb] = counting[index_comb] + 1
+
+        a_prob_ind = []
+        b_prob_ind = []
+
+    total = sum(counting)
+  
+    prob_cnjt = counting/total
+     
     return prob_cnjt
 
 
-# In[5]:
+# In[4]:
 
 
 #Joint probability evaluation p(i_t+h, i_t**k)
@@ -53,7 +107,7 @@ def joint_prob_ih_ik(k,l, joint_prob_ih_ik_jl):
     return p_jnt_ith_ik
 
 
-# In[6]:
+# In[5]:
 
 
 def conditional_prob(k,l,joint_prob):
@@ -76,6 +130,9 @@ def conditional_prob(k,l,joint_prob):
     return conditional
 
 
+# In[6]:
+
+
 #Division of the conditionals in log2 
 #tested
 def conditional_div(k,l,conditional_num, conditional_den):
@@ -88,7 +145,9 @@ def conditional_div(k,l,conditional_num, conditional_den):
     return conditional_division
 
 
-#Transfer entropy final evaluation
+# In[7]:
+
+
 #Transfer entropy final evaluation
 def te(k,l,h,a,b):
     '''
@@ -112,6 +171,9 @@ def te(k,l,h,a,b):
     return te
 
 
+# In[8]:
+
+
 def transferEntropy_case(df, k, l, h):
     
     '''Evaluate Transfer entropy for a dataframe of variables'''
@@ -130,6 +192,14 @@ def transferEntropy_case(df, k, l, h):
     print(end - start)
     return transEntropy  
 
+
+# In[ ]:
+
+
+
+
+
+# In[9]:
 
 
 #joint probablity for functions test
